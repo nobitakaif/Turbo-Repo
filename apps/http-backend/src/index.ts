@@ -2,6 +2,7 @@ import express from "express";
 import {CreateRoomSchema, CreateUserSchema, SigninSchema}from "@repo/common/types"
 import jwt from "jsonwebtoken"
 import { JWT_SCRETE } from "@repo/backend-common/config";
+import { prismaClient } from "@repo/db/client"
 import { middleware } from "./middleware";
 
 const app=express()
@@ -21,9 +22,25 @@ app.post("/signup",function(req,res){
     }
     const username = req.body.username
     const password = req.body.password
+    const name = req.body.name
 
     // write logic to store this in db
-
+    try{
+        prismaClient.user.create({
+            data:{
+                email : isSafe.data.username,
+                password : isSafe.data.password,
+                name : isSafe.data.name
+            }
+        })
+    }catch(e){
+        res.status(500).send({
+            msg:"maybe db crashed"
+            
+        })
+        console.log(e)
+        return
+    }
     res.status(200).send({
         msg:"you're logged-in"
     })
